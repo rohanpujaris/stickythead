@@ -1,8 +1,8 @@
 {
   "name": "stickythead",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sticky table header (Vanilla js)",
-  "main": "dist/stickyThead",
+  "main": "dist/stickyThead.js",
   "scripts": {
     "build": "webpack"
   },
