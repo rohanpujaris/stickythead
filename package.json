@@ -6,8 +6,13 @@
   "scripts": {
     "build": "webpack"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["sticky table header", "position sticky", "sticky table"],
+  "author": {
+    "name": "Rohan Pujari",
+    "email": "rohanpujaris@gmail.com",
+    "url": "https://github.com/rohanpujaris/stickythead/"
+  },
+  "homepage": "https://github.com/quickleft/react-loader",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "7.8.6",
