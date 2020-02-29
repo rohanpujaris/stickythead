@@ -1,9 +1,11 @@
 import * as Util from './util'
+import CustomEventPolyfill from './custom_event_polyfill'
 
 var dataStore = Util.DataStore();
+CustomEventPolyfill()
 
 export function apply(elements, options) {
-  var name = 'stickyTableHeaders',
+  var name = 'stickyThead',
     id = 0,
     defaults = {
       fixedOffset: 0,
@@ -52,8 +54,7 @@ export function apply(elements, options) {
       base.$originalHeader = base.el.querySelector('thead');
       base.$clonedHeader = base.$originalHeader.cloneNode(true);
       // dispatchEvent
-      // TODO:
-      // $this.trigger('clonedHeader.' + name, [base.$clonedHeader]);
+      Util.fireEvent('clonedHeader.' + name, base.el, base.$clonedHeader)
 
       base.$clonedHeader.setAttribute('class', 'tableFloatingHeader');
       Util.setStyles(base.$clonedHeader, { display: 'none', opacity: 0 })
@@ -81,21 +82,21 @@ export function apply(elements, options) {
     };
 
     base.destroy = function () {
-      base.$el.unbind('destroyed', base.teardown);
+      base.el && base.el.removeEventListener('destroyed', base.teardown);
       base.teardown();
     };
 
     base.teardown = function () {
       if (base.isSticky) {
-        base.$originalHeader.css('position', 'static');
+        Util.setStyles(base.$originalHeader, { position: 'static' });
       }
-      $.removeData(base.el, 'plugin_' + name);
+      dataStore.removeData(base.el, name)
       base.unbind();
 
-      base.$clonedHeader.remove();
-      base.$originalHeader.removeClass('tableFloatingHeaderOriginal');
-      base.$originalHeader.css('visibility', 'visible');
-      base.$printStyle.remove();
+      base.$clonedHeader.parentNode.removeChild(base.$clonedHeader);
+      base.$originalHeader.classList.remove('tableFloatingHeaderOriginal');
+      Util.setStyles(base.$originalHeader, { visibility: 'visible' });
+      base.$printStyle.parentNode.removeChild(base.$printStyle);
 
       base.el = null;
       base.$el = null;
@@ -113,12 +114,12 @@ export function apply(elements, options) {
 
     base.unbind = function () {
       // unbind window events by specifying handle so we don't remove too much
-      // base.$scrollableArea.off('.' + name, base.toggleHeaders);
-      // if (!base.isWindowScrolling) {
-      //   base.$window.off('.' + name + base.id, base.setPositionValues);
-      //   base.$window.off('.' + name + base.id, base.toggleHeaders);
-      // }
-      // base.$scrollableArea.off('.' + name, base.updateWidth);
+      base.$scrollableArea.removeEventListener('scroll', base.toggleHeaders);
+      if (!base.isWindowScrolling) {
+        base.$window.removeEventListener('scroll', base.setPositionValues);
+        base.$window.removeEventListener('resize', base.toggleHeaders);
+      }
+      base.$scrollableArea.removeEventListener('resize', base.updateWidth);
     };
 
     // We debounce the functions bound to the scroll and resize events
@@ -146,7 +147,6 @@ export function apply(elements, options) {
 
           scrollTop = base.$scrollableArea.pageYOffset + newTopOffset,
           scrollLeft = base.$scrollableArea.pageXOffset,
-
           headerHeight,
 
           scrolledPastTop = base.isWindowScrolling ?
@@ -159,14 +159,14 @@ export function apply(elements, options) {
           notScrolledPastBottom = (base.isWindowScrolling ? scrollTop : 0) <
             (offset.top + Util.getHeight(base.el) - headerHeight - (base.isWindowScrolling ? 0 : newTopOffset));
         }
-        // console.log(scrollTop, offset.top, base.$clonedHeader, headerHeight, (base.isWindowScrolling ? 0 : newTopOffset))
+
         if (scrolledPastTop && notScrolledPastBottom) {
           newLeft = offset.left - scrollLeft + base.options.leftOffset;
           Util.setStyles(base.$originalHeader, {
             position: 'fixed',
-            marginTop: base.options.marginTop,
+            marginTop: base.options.marginTop + 'px',
             top: 0,
-            left: newLeft,
+            left: newLeft + 'px',
             zIndex: base.options.zIndex
           });
           base.leftOffset = newLeft;
@@ -176,8 +176,7 @@ export function apply(elements, options) {
             base.isSticky = true;
             // make sure the width is correct: the user might have resized the browser while in static mode
             base.updateWidth();
-            // Todo
-            // $this.trigger('enabledStickiness.' + name);
+            Util.fireEvent('enabledStickiness.' + name, base.el)
           }
           base.setPositionValues();
         } else if (base.isSticky) {
@@ -185,8 +184,7 @@ export function apply(elements, options) {
           base.$clonedHeader.style.display = 'none';
           base.isSticky = false;
           base.resetWidth(base.$clonedHeader.querySelectorAll('td,th'), base.$originalHeader.querySelectorAll('td,th'));
-          // Todo
-          // $this.trigger('disabledStickiness.' + name);
+          Util.fireEvent('disabledStickiness.' + name, base.el)
         }
       }
     }, 0);
@@ -194,14 +192,15 @@ export function apply(elements, options) {
     base.setPositionValues = base.debounce(function () {
       var winScrollTop = base.$window.pageYOffset,
         winScrollLeft = base.$window.pageXOffset;
+
       if (!base.isSticky ||
         winScrollTop < 0 || winScrollTop + Util.getHeight(base.$window) > Util.getHeight(base.$document) ||
         winScrollLeft < 0 || winScrollLeft + Util.getWidth(base.$window) > Util.getWidth(base.$document)) {
         return;
       }
       Util.setStyles(base.$originalHeader, {
-        top: base.topOffset - (base.isWindowScrolling ? 0 : winScrollTop),
-        left: base.leftOffset - (base.isWindowScrolling ? 0 : winScrollLeft)
+        top: base.topOffset - (base.isWindowScrolling ? 0 : winScrollTop) + 'px',
+        left: base.leftOffset - (base.isWindowScrolling ? 0 : winScrollLeft) + 'px'
       });
     }, 0);
 
@@ -233,7 +232,7 @@ export function apply(elements, options) {
       $clonedHeaders.forEach(function (el, index) {
         var width;
 
-        if (el.style.boxSizing === 'border-box') {
+        if (getComputedStyle(el).boxSizing === 'border-box') {
           var boundingClientRect = el.getBoundingClientRect();
           if (boundingClientRect.width) {
             width = boundingClientRect.width; // #39: border-box bug
@@ -267,8 +266,8 @@ export function apply(elements, options) {
       $clonedHeaders.forEach(function (_, index) {
         var width = widths[index];
         Util.setStyles($origHeaders[index], {
-          minWidth: width,
-          maxWidth: width
+          minWidth: width + 'px',
+          maxWidth: width + 'px'
         });
       });
     };

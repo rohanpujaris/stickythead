@@ -10,10 +10,11 @@ module.exports = [
     path: path.resolve(__dirname, 'dist'),
     filename: 'stickythead.js',
     library: 'stickyThead',
+    libraryTarget: 'umd',
   },
   devtool,
   optimization: {
-    minimizer: [new UglifyJsPlugin({ test: /\.js(\?.*)?$/i })],
+    minimizer: [new UglifyJsPlugin({ test: /\.js(\?.*)?$/i, sourceMap: true })],
   },
   module: {
     rules: [

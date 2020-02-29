@@ -20,8 +20,8 @@ export function DataStore() {
         this._data[obj][key] = val;
       }
     },
-    removeData: function(obj, key) {
-
+    removeData: function (obj, key) {
+      delete this._data[obj]
     },
     _data: {}
   };
@@ -39,8 +39,8 @@ export function extendObj(defaultObj, overrideObj) {
 export function getOffset(el) {
   var rect = el.getBoundingClientRect();
   return {
-    top: rect.top + window.scrollY,
-    left: rect.left + window.scrollX,
+    top: rect.top + window.pageYOffset,
+    left: rect.left + window.pageXOffset,
   };
 }
 
@@ -57,7 +57,8 @@ export function getHeight(el) {
       document.documentElement["offsetHeight"]
     );
   }
-  return parseFloat(getComputedStyle(el, null).height.replace("px", ""))
+  var height = parseFloat(getComputedStyle(el, null).height.replace("px", ""))
+  return height ? height : el.offsetHeight
 }
 
 export function getWidth(el) {
@@ -73,7 +74,8 @@ export function getWidth(el) {
       document.documentElement["offsetWidth"]
     );
   }
-  return parseFloat(getComputedStyle(el, null).width.replace("px", ""))
+  var width = parseFloat(getComputedStyle(el, null).width.replace("px", ""))
+  return width ? width : el.offsetWidth
 }
 
 export function setStyles(el, propertyObject) {
@@ -81,3 +83,8 @@ export function setStyles(el, propertyObject) {
     el.style[property] = propertyObject[property];
 }
 
+export function fireEvent(name, el, data) {
+  var details = data ? {} : { details: data }
+  var evt = new CustomEvent(name, details)
+  el.dispatchEvent(evt)
+}
