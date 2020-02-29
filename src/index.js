@@ -1,5 +1,7 @@
 import * as Util from './util'
 
+var dataStore = Util.DataStore();
+
 export function apply(elements, options) {
   var name = 'stickyTableHeaders',
     id = 0,
@@ -142,8 +144,8 @@ export function apply(elements, options) {
             Util.getOffset(base.$scrollableArea).top + (!isNaN(base.options.fixedOffset) ? base.options.fixedOffset : 0),
           offset = Util.getOffset(base.el),
 
-          scrollTop = base.$scrollableArea.scrollY + newTopOffset,
-          scrollLeft = base.$scrollableArea.scrollX,
+          scrollTop = base.$scrollableArea.pageYOffset + newTopOffset,
+          scrollLeft = base.$scrollableArea.pageXOffset,
 
           headerHeight,
 
@@ -306,7 +308,7 @@ export function apply(elements, options) {
   }
 
   return elements.forEach(function (element) {
-    var instance = element.dataset[name]
+    var instance = dataStore.data(element, name)
     if (instance) {
       if (typeof options === 'string') {
         instance[options].apply(instance);
@@ -314,7 +316,7 @@ export function apply(elements, options) {
         instance.updateOptions(options);
       }
     } else if (options !== 'destroy') {
-      element.dataset[name] = new Plugin(element, options);
+      dataStore.data(element, name, new Plugin(element, options));
     }
   });
 }
