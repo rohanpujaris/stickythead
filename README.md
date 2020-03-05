@@ -1,6 +1,6 @@
 StickyThead
 ==================
-### NOTE: This is vanila js version of https://github.com/jmosbech/StickyThead. Even docs are copy pasted :)
+### NOTE: This is vanila js version of https://github.com/jmosbech/StickyTableHeaders. Even docs are copy pasted :)
 
 So what's it good for? Well, let's say you want to display a long list of fairly uniform tabluar data, like [stock exchange listings](http://online.barrons.com/public/page/majormarket-nysecomposite-A.html) or [sport statistics](https://sports.yahoo.com/nfl/stats/weekly/?sortStatId=PASSING_YARDS&selectedTable=7) but you don't want your users to get lost in the data as they scroll down on the page.
 
