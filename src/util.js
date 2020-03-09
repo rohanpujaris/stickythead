@@ -1,30 +1,26 @@
 export function DataStore() {
   return {
-    data: function (obj, key, val) {
-      if (!obj) {
-        return this._data;
-      } else if (!key) {
-        if (!(obj in this._data)) {
-          return {};
-        }
-        return this._data[obj];
-      } else if (arguments.length < 3) {
-        if (!(obj in this._data)) {
-          return undefined;
-        }
-        return this._data[obj][key];
-      } else {
-        if (!(obj in this._data)) {
-          this._data[obj] = {};
-        }
-        this._data[obj][key] = val;
+    _storage: new WeakMap(),
+    put: function (element, key, obj) {
+      if (!this._storage.has(element)) {
+        this._storage.set(element, new Map());
       }
+      this._storage.get(element).set(key, obj);
     },
-    removeData: function (obj, key) {
-      delete this._data[obj]
+    get: function (element, key) {
+      let data = this._storage.get(element)
+      return data && data.get(key);
     },
-    _data: {}
-  };
+    remove: function (element, key) {
+      let data = this._storage.get(element)
+      if (!data) { return }
+      let ret = data.delete(key);
+      if (!data.size === 0) {
+        this._storage.delete(element);
+      }
+      return ret;
+    }
+  }
 }
 
 export function extendObj(defaultObj, overrideObj) {

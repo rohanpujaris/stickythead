@@ -2,6 +2,7 @@ import * as Util from './util'
 import CustomEventPolyfill from './custom_event_polyfill'
 
 var dataStore = Util.DataStore();
+window.dataStore = dataStore
 CustomEventPolyfill()
 
 export function apply(elements, options) {
@@ -90,7 +91,7 @@ export function apply(elements, options) {
       if (base.isSticky) {
         Util.setStyles(base.$originalHeader, { position: 'static' });
       }
-      dataStore.removeData(base.el, name)
+      dataStore.remove(base.el, name)
       base.unbind();
 
       base.$clonedHeader.parentNode.removeChild(base.$clonedHeader);
@@ -307,7 +308,7 @@ export function apply(elements, options) {
   }
 
   return elements.forEach(function (element) {
-    var instance = dataStore.data(element, name)
+    var instance = dataStore.get(element, name)
     if (instance) {
       if (typeof options === 'string') {
         instance[options].apply(instance);
@@ -315,7 +316,7 @@ export function apply(elements, options) {
         instance.updateOptions(options);
       }
     } else if (options !== 'destroy') {
-      dataStore.data(element, name, new Plugin(element, options));
+      dataStore.put(element, name, new Plugin(element, options));
     }
   });
 }

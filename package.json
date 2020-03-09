@@ -1,18 +1,22 @@
 {
   "name": "stickythead",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Sticky table header (Vanilla js)",
   "main": "dist/stickythead.js",
   "scripts": {
     "build": "webpack"
   },
-  "keywords": ["sticky table header", "position sticky", "sticky table"],
+  "keywords": [
+    "sticky table header",
+    "position sticky",
+    "sticky table"
+  ],
   "author": {
     "name": "Rohan Pujari",
     "email": "rohanpujaris@gmail.com",
     "url": "https://github.com/rohanpujaris/stickythead/"
   },
-  "homepage": "https://github.com/quickleft/react-loader",
+  "homepage": "https://github.com/rohanpujaris/stickythead/",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "7.8.6",
